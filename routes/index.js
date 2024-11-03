@@ -5,5 +5,8 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
+router.get('/MinDesign', function(req, res, next) {
+  res.send("<h1>Страница Минимальистичного Дизайна</h1>")
+});
 
 module.exports = router;
