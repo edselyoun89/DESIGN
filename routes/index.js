@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const Design = require('../models/Design'); // Подключение модели Design
+const User = require('../models/User'); // Подключение модели User
+
 
 /* GET главная страница */
 router.get('/', function (req, res, next) {
@@ -17,6 +19,86 @@ router.get('/', function (req, res, next) {
     hideNoDesignsMessage: true,
   });
 });
+
+/* GET login/registration page. */
+router.get('/logreg', function(req, res, next) {
+  res.render('logreg',{title: 'Вход'});
+  });
+
+router.post('/login', async function (req, res, next) {
+  const { username, password } = req.body;
+
+  try {
+    // Поиск пользователя
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.render('login', {
+        title: 'Вход',
+        errorMessage: 'Неправильное имя пользователя или пароль',
+      });
+    }
+
+    // Проверка пароля
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.render('login', {
+        title: 'Вход',
+        errorMessage: 'Неправильное имя пользователя или пароль',
+      });
+    }
+
+    // Успешный вход
+    req.session.user = { id: user._id, username: user.username };
+    res.redirect('/');
+  } catch (err) {
+    console.error('Ошибка входа:', err);
+    res.render('login', {
+      title: 'Вход',
+      errorMessage: 'Произошла ошибка. Попробуйте снова.',
+    });
+  }
+});
+
+
+
+// GET страница регистрации
+router.get('/register', (req, res) => {
+  res.render('register', { title: 'Регистрация', errorMessage: null });
+});
+
+// POST запрос для регистрации
+router.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+      // Проверка, существует ли пользователь
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+          return res.render('register', {
+              title: 'Регистрация',
+              errorMessage: 'Пользователь с таким именем уже существует.',
+          });
+      }
+
+      // Создание нового пользователя
+      const newUser = new User({ username, password });
+      await newUser.save();
+
+      // Редирект на главную страницу или страницу входа
+      res.redirect('/login');
+  } catch (err) {
+      console.error('Ошибка при регистрации:', err.message);
+      res.render('register', {
+          title: 'Регистрация',
+          errorMessage: 'Произошла ошибка. Попробуйте снова.',
+      });
+  }
+});
+
+
+
+
+
 
 /* GET установка cookie */
 router.get('/set-cookie', function (req, res, next) {
@@ -124,27 +206,22 @@ router.get('/delete/:id', async function (req, res, next) {
   }
 });
 
-/* GET страница конкретного дизайна по ID */
-router.get('/design/:designId', async function (req, res, next) {
-  try {
-    const designId = req.params.designId; // Извлечение параметра из URL
-    const design = await Design.findById(designId); // Поиск дизайна по ID
 
-    if (!design) {
-      return res.status(404).send('Дизайн не найден');
-    }
 
-    res.render('design', {
-      title: design.title,
-      picture: design.picture,
-      desc: design.desc,
-    });
-  } catch (err) {
-    console.error('Ошибка загрузки дизайна:', err.message);
-    res.status(500).send('Ошибка загрузки данных');
+
+
+
+
+
+router.get('/check-session', (req, res) => {
+  if (!req.session.viewCount) {
+      req.session.viewCount = 1;
+  } else {
+      req.session.viewCount += 1;
   }
+  console.log('Текущая сессия:', req.session);
+  res.send(`Вы посетили эту страницу ${req.session.viewCount} раз.`);
 });
-
 
 /* GET страницы дизайнов по названию (title). */
 router.get('/:designTitle', async function (req, res, next) {
@@ -165,33 +242,25 @@ router.get('/:designTitle', async function (req, res, next) {
 });
 
 
-
-router.get('/check-session', (req, res) => {
-  if (!req.session.viewCount) {
-      req.session.viewCount = 1;
-  } else {
-      req.session.viewCount += 1;
-  }
-  console.log('Текущая сессия:', req.session);
-  res.send(`Вы посетили эту страницу ${req.session.viewCount} раз.`);
-});
-
-router.get('/track-views', async function (req, res, next) {
+/* GET страница конкретного дизайна по ID */
+router.get('/design/:designId', async function (req, res, next) {
   try {
-      if (!req.session.viewCount) {
-          req.session.viewCount = 1; // Устанавливаем начальное значение
-      } else {
-          req.session.viewCount++; // Увеличиваем счетчик
-      }
+    const designId = req.params.designId; // Извлечение параметра из URL
+    const design = await Design.findById(designId); // Поиск дизайна по ID
 
-      const views = req.session.viewCount;
-      res.send(`Вы посетили эту страницу ${views} раз.`);
+    if (!design) {
+      return res.status(404).send('Дизайн не найден');
+    }
+
+    res.render('design', {
+      title: design.title,
+      picture: design.picture,
+      desc: design.desc,
+    });
   } catch (err) {
-      console.error('Ошибка при отслеживании посещений:', err.message);
-      res.status(500).send('Ошибка сервера');
+    console.error('Ошибка загрузки дизайна:', err.message);
+    res.status(500).send('Ошибка загрузки данных');
   }
 });
-
-
 
 module.exports = router;
