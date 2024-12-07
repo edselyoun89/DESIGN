@@ -1,6 +1,10 @@
 var express = require('express');
 var router = express.Router();
 const Design = require('../models/Design'); // Подключение модели Design
+const Design = require('../models/Design');
+const Category = require('../models/Category');
+const Review = require('../models/Review');
+
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
