@@ -5,14 +5,23 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const engine = require('ejs-locals'); // Подключение ejs-locals для шаблонов
 const connectDB = require('./db'); // Подключение функции для соединения с базой данных
+const session = require('express-session'); // Подключаем express-session
+
+// Инициализация приложения
+const app = express();
+
+// Настройка сессий
+app.use(
+  session({
+    secret: 'your_secret_key', // Замените на более сложный ключ
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 3600000 }, // Cookie действуют 1 час
+  })
+);
 
 // Подключение к базе данных
 connectDB();
-
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-
-const app = express();
 
 // Установка шаблонизатора ejs-locals
 app.engine('ejs', engine);
@@ -26,7 +35,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Маршруты
+// Подключение маршрутов
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 

@@ -3,19 +3,21 @@ var router = express.Router();
 const Design = require('../models/Design'); // Подключение модели Design
 
 /* GET главная страница */
-router.get('/', async function (req, res, next) {
-  try {
-    const designs = []; // Пустой список для главной страницы
-    res.render('index', { 
-      title: 'Добро пожаловать на Design Project', 
-      designs, 
-      hideNoDesignsMessage: true // Скрыть сообщение "Дизайны не найдены"
-    });
-  } catch (err) {
-    console.error('Ошибка загрузки главной страницы:', err.message);
-    res.status(500).send('Ошибка загрузки данных');
+router.get('/', function (req, res, next) {
+  if (!req.session.views) {
+    req.session.views = 1; // Если сессии нет, задаём начальное значение
+  } else {
+    req.session.views++; // Увеличиваем количество посещений
   }
+
+  res.render('index', {
+    title: 'Добро пожаловать на Design Project',
+    views: req.session.views, // Передаём количество посещений в шаблон
+    designs: [],
+    hideNoDesignsMessage: true,
+  });
 });
+
 
 /* GET страница со списком всех дизайнов */
 router.get('/designs', async function (req, res, next) {
