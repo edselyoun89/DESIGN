@@ -18,6 +18,19 @@ router.get('/', function (req, res, next) {
   });
 });
 
+/* GET установка cookie */
+router.get('/set-cookie', function (req, res, next) {
+  // Установка cookie
+  res.cookie('userSession', 'active', { maxAge: 3600000, httpOnly: true }); // Cookie с действием на 1 час
+  res.send('Cookie установлена');
+});
+
+/* GET удаление cookie */
+router.get('/clear-cookie', function (req, res, next) {
+  // Очистка cookie
+  res.clearCookie('userSession');
+  res.send('Cookie очищена');
+});
 
 /* GET страница со списком всех дизайнов */
 router.get('/designs', async function (req, res, next) {
