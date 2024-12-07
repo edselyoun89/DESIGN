@@ -1,3 +1,4 @@
+
 <form action="/search" method="GET" class="d-flex mb-4">
     <input 
       type="text" 
@@ -21,14 +22,13 @@
                         <h5 class="card-title"><%= design.title %></h5>
                         <p class="card-text"><%= design.desc %></p>
                         <a href="/<%= design.title %>" class="btn btn-primary mb-2">Подробнее</a>
-                        <a href="/edit/<%= design._id %>" class="btn btn-warning btn-sm">Редактировать</a>
-                        <a href="/delete/<%= design._id %>" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены, что хотите удалить этот дизайн?')">Удалить</a>
                     </div>
                 </div>
             </div>
         <% }); %>
     <% } else { %>
-        <p class="text-center">Дизайны не найдены</p>
+        <p>Дизайны не найдены</p>
     <% } %>
 </div>
+
 <a href="/add" class="btn btn-success">Добавить новый дизайн</a>

@@ -1,24 +1,27 @@
 var express = require('express');
 var router = express.Router();
 const Design = require('../models/Design'); // Подключение модели Design
-const Design = require('../models/Design');
-const Category = require('../models/Category');
-const Review = require('../models/Review');
-
+const Category = require('../models/Category'); // Подключение модели Category
+const Review = require('../models/Review'); // Подключение модели Review
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
   try {
     const designs = await Design.find(); // Получить все дизайны из базы данных
+    console.log('Дизайны из базы:', designs); // Отладочный вывод
     res.render('index', { 
       title: 'Добро пожаловать на Design Project', 
-      designs // Передача данных о дизайнах в шаблон
+      designs // Передача данных в шаблон
     });
   } catch (err) {
     console.error('Ошибка загрузки дизайнов:', err.message);
     res.status(500).send('Ошибка загрузки данных');
   }
 });
+
+
+
+
 
 /* GET страница добавления дизайна */
 router.get('/add', function (req, res, next) {
