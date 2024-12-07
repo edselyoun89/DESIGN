@@ -1,6 +1,18 @@
 <% layout('./layout/page.ejs') %>
 <h1 class="text-center"><%= title %></h1>
 
+<form action="/search" method="GET" class="d-flex mb-4">
+    <input 
+      type="text" 
+      name="q" 
+      class="form-control me-2" 
+      placeholder="Введите название дизайна" 
+      value="<%= searchQuery || '' %>" 
+      required>
+    <button type="submit" class="btn btn-primary">Найти</button>
+</form>
+
+
 <div class="row">
   <% if (designs && designs.length > 0) { %>
     <% designs.forEach(design => { %>

@@ -1,17 +1,30 @@
 var express = require('express');
 var router = express.Router();
 const Design = require('../models/Design'); // Подключение модели Design
-const Category = require('../models/Category'); // Подключение модели Category
-const Review = require('../models/Review'); // Подключение модели Review
 
-/* GET home page. */
+/* GET главная страница */
 router.get('/', async function (req, res, next) {
   try {
-    const designs = await Design.find(); // Получить все дизайны из базы данных
+    const designs = []; // Пустой список для главной страницы
     res.render('index', { 
       title: 'Добро пожаловать на Design Project', 
       designs, 
-      hideNoDesignsMessage: true // Отключить сообщение на главной странице
+      hideNoDesignsMessage: true // Скрыть сообщение "Дизайны не найдены"
+    });
+  } catch (err) {
+    console.error('Ошибка загрузки главной страницы:', err.message);
+    res.status(500).send('Ошибка загрузки данных');
+  }
+});
+
+/* GET страница со списком всех дизайнов */
+router.get('/designs', async function (req, res, next) {
+  try {
+    const designs = await Design.find(); // Получить все дизайны
+    res.render('designs', { 
+      title: 'Список всех дизайнов', 
+      designs,
+      searchQuery: '' // Передать пустую строку для поля поиска
     });
   } catch (err) {
     console.error('Ошибка загрузки дизайнов:', err.message);
@@ -20,17 +33,79 @@ router.get('/', async function (req, res, next) {
 });
 
 
-/* GET список всех дизайнов */
-router.get('/designs', async function (req, res, next) {
+/* GET страница добавления нового дизайна */
+router.get('/add', function (req, res, next) {
+  res.render('add', { title: 'Добавить новый дизайн' });
+});
+
+/* POST запрос для добавления нового дизайна */
+router.post('/add', async function (req, res, next) {
   try {
-    const designs = await Design.find(); // Извлечение всех записей из коллекции Design
-    res.render('designs', { 
-      title: 'Список всех дизайнов', 
-      designs 
-    }); // Передача данных в шаблон
+    const { title, picture, desc } = req.body;
+    const newDesign = new Design({ title, picture, desc });
+    await newDesign.save(); // Сохранение дизайна в базе данных
+    res.redirect('/designs'); // Перенаправление на страницу со всеми дизайнами
   } catch (err) {
-    console.error('Ошибка извлечения данных:', err.message);
+    console.error('Ошибка добавления дизайна:', err.message);
+    res.status(500).send('Ошибка добавления дизайна');
+  }
+});
+
+/* GET запрос для поиска дизайнов */
+router.get('/search', async function (req, res, next) {
+  try {
+    const query = req.query.q || ''; // Получить поисковый запрос, если он есть
+    const designs = await Design.find({
+      title: { $regex: query, $options: 'i' } // Регистронезависимый поиск по названию
+    });
+
+    res.render('designs', { 
+      title: 'Результаты поиска', 
+      designs, 
+      searchQuery: query // Передать поисковый запрос в шаблон
+    });
+  } catch (err) {
+    console.error('Ошибка поиска дизайнов:', err.message);
+    res.status(500).send('Ошибка поиска');
+  }
+});
+
+
+
+/* GET запрос для редактирования дизайна */
+router.get('/edit/:id', async function (req, res, next) {
+  try {
+    const design = await Design.findById(req.params.id); // Найти дизайн по ID
+    if (!design) {
+      return res.status(404).send('Дизайн не найден');
+    }
+    res.render('edit', { title: 'Редактировать дизайн', design });
+  } catch (err) {
+    console.error('Ошибка загрузки дизайна для редактирования:', err.message);
     res.status(500).send('Ошибка загрузки данных');
+  }
+});
+
+/* POST запрос для обновления дизайна */
+router.post('/edit/:id', async function (req, res, next) {
+  try {
+    const { title, picture, desc } = req.body;
+    await Design.findByIdAndUpdate(req.params.id, { title, picture, desc }); // Обновить дизайн
+    res.redirect('/designs'); // Перенаправление на страницу со всеми дизайнами
+  } catch (err) {
+    console.error('Ошибка обновления дизайна:', err.message);
+    res.status(500).send('Ошибка обновления данных');
+  }
+});
+
+/* GET запрос для удаления дизайна */
+router.get('/delete/:id', async function (req, res, next) {
+  try {
+    await Design.findByIdAndDelete(req.params.id); // Удалить дизайн по ID
+    res.redirect('/designs'); // Перенаправление на страницу со всеми дизайнами
+  } catch (err) {
+    console.error('Ошибка удаления дизайна:', err.message);
+    res.status(500).send('Ошибка удаления данных');
   }
 });
 
@@ -56,82 +131,6 @@ router.get('/design/:designId', async function (req, res, next) {
 });
 
 
-
-/* GET страница добавления дизайна */
-router.get('/add', function (req, res, next) {
-  res.render('add', { title: 'Добавить новый дизайн' });
-});
-
-/* POST запрос для добавления нового дизайна */
-router.post('/add', async function (req, res, next) {
-  try {
-    const { title, picture, desc } = req.body;
-    const newDesign = new Design({ title, picture, desc });
-    await newDesign.save(); // Сохранение нового дизайна в базе
-    res.redirect('/'); // Перенаправление на главную страницу после добавления
-  } catch (err) {
-    console.error('Ошибка добавления дизайна:', err.message);
-    res.status(500).send('Ошибка добавления дизайна');
-  }
-});
-
-/* GET запрос для поиска дизайнов */
-router.get('/search', async function (req, res, next) {
-  try {
-    const query = req.query.q; // Получить строку поиска из параметров запроса
-    const designs = await Design.find({
-      title: { $regex: query, $options: 'i' } // Регистронезависимый поиск по названию
-    });
-
-    // Если результаты поиска пусты
-    res.render('index', { 
-      title: 'Результаты поиска', 
-      designs, 
-      hideNoDesignsMessage: false // Показать сообщение, если ничего не найдено
-    });
-  } catch (err) {
-    console.error('Ошибка поиска дизайнов:', err.message);
-    res.status(500).send('Ошибка поиска');
-  }
-});
-
-/* GET страница редактирования дизайна */
-router.get('/edit/:id', async function (req, res, next) {
-  try {
-    const design = await Design.findById(req.params.id); // Найти дизайн по ID
-    if (!design) {
-      return res.status(404).send('Дизайн не найден');
-    }
-    res.render('edit', { title: 'Редактировать дизайн', design });
-  } catch (err) {
-    console.error('Ошибка загрузки дизайна для редактирования:', err.message);
-    res.status(500).send('Ошибка загрузки данных');
-  }
-});
-
-/* POST запрос для обновления дизайна */
-router.post('/edit/:id', async function (req, res, next) {
-  try {
-    const { title, picture, desc } = req.body;
-    await Design.findByIdAndUpdate(req.params.id, { title, picture, desc }); // Обновить данные в базе
-    res.redirect('/'); // Перенаправление на главную страницу
-  } catch (err) {
-    console.error('Ошибка обновления дизайна:', err.message);
-    res.status(500).send('Ошибка обновления данных');
-  }
-});
-
-/* GET запрос для удаления дизайна */
-router.get('/delete/:id', async function (req, res, next) {
-  try {
-    await Design.findByIdAndDelete(req.params.id); // Удалить дизайн по ID
-    res.redirect('/'); // Перенаправление на главную страницу
-  } catch (err) {
-    console.error('Ошибка удаления дизайна:', err.message);
-    res.status(500).send('Ошибка удаления данных');
-  }
-});
-
 /* GET страницы дизайнов по названию (title). */
 router.get('/:designTitle', async function (req, res, next) {
   try {
@@ -142,7 +141,7 @@ router.get('/:designTitle', async function (req, res, next) {
     res.render('design', {
       title: design.title,
       picture: design.picture,
-      desc: design.desc
+      desc: design.desc,
     });
   } catch (err) {
     console.error('Ошибка загрузки дизайна:', err.message);
@@ -151,4 +150,3 @@ router.get('/:designTitle', async function (req, res, next) {
 });
 
 module.exports = router;
-
