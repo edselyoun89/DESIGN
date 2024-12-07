@@ -10,7 +10,8 @@ router.get('/', async function (req, res, next) {
     const designs = await Design.find(); // Получить все дизайны из базы данных
     res.render('index', { 
       title: 'Добро пожаловать на Design Project', 
-      designs // Передача данных в шаблон
+      designs, 
+      hideNoDesignsMessage: true // Отключить сообщение на главной странице
     });
   } catch (err) {
     console.error('Ошибка загрузки дизайнов:', err.message);
@@ -18,6 +19,20 @@ router.get('/', async function (req, res, next) {
   }
 });
 
+
+/* GET список всех дизайнов */
+router.get('/designs', async function (req, res, next) {
+  try {
+    const designs = await Design.find(); // Извлечение всех записей из коллекции Design
+    res.render('designs', { 
+      title: 'Список всех дизайнов', 
+      designs 
+    }); // Передача данных в шаблон
+  } catch (err) {
+    console.error('Ошибка извлечения данных:', err.message);
+    res.status(500).send('Ошибка загрузки данных');
+  }
+});
 
 /* GET страница конкретного дизайна по ID */
 router.get('/design/:designId', async function (req, res, next) {
@@ -69,18 +84,10 @@ router.get('/search', async function (req, res, next) {
     });
 
     // Если результаты поиска пусты
-    if (designs.length === 0) {
-      return res.render('index', { 
-        title: 'Результаты поиска', 
-        designs: [], 
-        message: 'Дизайны не найдены' 
-      });
-    }
-
-    // Отобразить найденные дизайны
     res.render('index', { 
       title: 'Результаты поиска', 
-      designs 
+      designs, 
+      hideNoDesignsMessage: false // Показать сообщение, если ничего не найдено
     });
   } catch (err) {
     console.error('Ошибка поиска дизайнов:', err.message);

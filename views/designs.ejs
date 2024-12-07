@@ -1,0 +1,21 @@
+<% layout('./layout/page.ejs') %>
+<h1 class="text-center"><%= title %></h1>
+
+<div class="row">
+  <% if (designs && designs.length > 0) { %>
+    <% designs.forEach(design => { %>
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <img src="<%= design.picture %>" class="card-img-top" alt="<%= design.title %>">
+          <div class="card-body">
+            <h5 class="card-title"><%= design.title %></h5>
+            <p class="card-text"><%= design.desc %></p>
+            <a href="/design/<%= design._id %>" class="btn btn-primary">Подробнее</a>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  <% } else { %>
+    <p class="text-center">Дизайны не найдены</p>
+  <% } %>
+</div>
