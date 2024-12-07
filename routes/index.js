@@ -164,4 +164,19 @@ router.get('/:designTitle', async function (req, res, next) {
   }
 });
 
+
+
+router.get('/check-session', (req, res) => {
+  if (!req.session.viewCount) {
+      req.session.viewCount = 1;
+  } else {
+      req.session.viewCount += 1;
+  }
+  console.log('Текущая сессия:', req.session);
+  res.send(`Вы посетили эту страницу ${req.session.viewCount} раз.`);
+});
+
+
+
+
 module.exports = router;

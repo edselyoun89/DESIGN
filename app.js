@@ -6,17 +6,23 @@ const logger = require('morgan');
 const engine = require('ejs-locals'); // Подключение ejs-locals для шаблонов
 const connectDB = require('./db'); // Подключение функции для соединения с базой данных
 const session = require('express-session'); // Подключаем express-session
+const MongoStore = require('connect-mongo'); // Подключаем хранилище MongoDB для сессий
+
 
 // Инициализация приложения
 const app = express();
 
-// Настройка сессий
+// Настройка сессий с использованием MongoDB
 app.use(
   session({
-    secret: 'your_secret_key', // Замените на более сложный ключ
+    secret: 'your_secret_key', // Уникальный ключ для подписи сессий
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false, maxAge: 3600000 }, // Cookie действуют 1 час
+    store: MongoStore.create({
+      mongoUrl: 'mongodb://localhost/design_project', // URL MongoDB
+      collectionName: 'sessions', // Имя коллекции для хранения сессий
+    }),
+    cookie: { secure: false, maxAge: 3600000 }, // Настройка cookie (1 час)
   })
 );
 
