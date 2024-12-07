@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Design = require('../models/Design'); // Подключение модели Design
-const User = require('../models/User'); // Подключение модели User
+const User = require('../models/user'); // Подключение модели User
 
 
 /* GET главная страница */

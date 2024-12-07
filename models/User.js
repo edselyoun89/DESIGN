@@ -1,22 +1,43 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+var mongoose = require("mongoose");
+var crypto = require("crypto");
 
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+var Schema = mongoose.Schema;
+
+var userSchema = new Schema({
+  username: {
+    type: String,
+    unique: true,
+    required: true,
+  },
+  hashedPassword: {
+    type: String,
+    required: true,
+  },
+  salt: {
+    type: String,
+    required: true,
+  },
+  created: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-// Перед сохранением пользователя хэшируйте пароль
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-});
+// Виртуальное поле для пароля
+userSchema
+  .virtual("password")
+  .set(function (password) {
+    this._purePassword = password;
+    this.salt = Math.random() + "";
+    this.hashedPassword = this.encryptPassword(password);
+  })
+  .get(function () {
+    return this._purePassword;
+  });
 
-// Сравнение паролей
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+// Метод для хэширования пароля
+userSchema.methods.encryptPassword = function (password) {
+  return crypto.createHmac("sha1", this.salt).update(password).digest("hex");
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports.User = mongoose.model("User", userSchema);
