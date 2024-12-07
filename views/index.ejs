@@ -1,37 +1,93 @@
-<form action="/search" method="GET" class="d-flex mb-4">
-    <input 
-      type="text" 
-      name="q" 
-      class="form-control me-2" 
-      placeholder="Введите название дизайна" 
-      required>
-    <button type="submit" class="btn btn-primary">Найти</button>
-</form>
-
-<% layout('./layout/page.ejs') %>
-<h1 class="text-center"><%= title %></h1>
-<p class="text-center">Количество посещений: <%= views || 0 %></p>
-
-
-<div class="row">
-    <% if (designs && designs.length > 0) { %>
-        <% designs.forEach(design => { %>
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <img src="<%= design.picture %>" class="card-img-top" alt="<%= design.title %>">
-                    <div class="card-body">
-                        <h5 class="card-title"><%= design.title %></h5>
-                        <p class="card-text"><%= design.desc %></p>
-                        <a href="/design/<%= design._id %>" class="btn btn-primary mb-2">Подробнее</a>
-                    </div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Design Project</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <% if (user) { %>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Привет, <%= user.username %>!</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/logout">Выйти</a>
+                            </li>
+                        <% } else { %>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/login">Вход</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/register">Регистрация</a>
+                            </li>
+                        <% } %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/designs">Все дизайны</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/add">Добавить дизайн</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        <% }); %>
-    <% } else if (!hideNoDesignsMessage) { %>
-        <!-- Показываем надпись "Дизайны не найдены", только если переменная hideNoDesignsMessage === false -->
-        <p class="text-center">Дизайны не найдены</p>
-    <% } %>
-</div>
+        </nav>
+    </header>
 
-<a href="/add" class="btn btn-success">Добавить новый дизайн</a>
-<a href="/designs" class="btn btn-secondary">Посмотреть все дизайны</a>
+    <main class="container mt-4">
+        <h1 class="text-center"><%= title %></h1>
+        <% if (user) { %>
+            <p class="text-center">Привет, <%= user.username %>! Добро пожаловать!</p>
+        <% } else { %>
+            <p class="text-center">Привет, гость! <a href="/register">Зарегистрируйтесь</a> или <a href="/login">войдите</a> в систему.</p>
+        <% } %>
+
+        <form action="/search" method="GET" class="d-flex mb-4">
+            <input 
+              type="text" 
+              name="q" 
+              class="form-control me-2" 
+              placeholder="Введите название дизайна" 
+              required>
+            <button type="submit" class="btn btn-primary">Найти</button>
+        </form>
+
+        <div class="row">
+            <% if (designs && designs.length > 0) { %>
+                <% designs.forEach(design => { %>
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <img src="<%= design.picture %>" class="card-img-top" alt="<%= design.title %>">
+                            <div class="card-body">
+                                <h5 class="card-title"><%= design.title %></h5>
+                                <p class="card-text"><%= design.desc %></p>
+                                <a href="/design/<%= design._id %>" class="btn btn-primary mb-2">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p class="text-center">Дизайны не найдены</p>
+            <% } %>
+        </div>
+
+        <a href="/add" class="btn btn-success">Добавить новый дизайн</a>
+        <a href="/designs" class="btn btn-secondary">Посмотреть все дизайны</a>
+    </main>
+
+    <footer class="bg-light text-center py-3 mt-4">
+        <p>© 2024 Design Project. Все права защищены.</p>
+    </footer>
+</body>
+</html>

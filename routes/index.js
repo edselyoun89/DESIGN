@@ -3,7 +3,6 @@ var router = express.Router();
 const Design = require('../models/Design'); // Подключение модели Design
 const User = require('../models/User'); // Подключение модели User
 
-
 /* GET главная страница */
 router.get('/', function (req, res, next) {
   if (!req.session.views) {
@@ -14,12 +13,50 @@ router.get('/', function (req, res, next) {
 
   res.render('index', {
     title: 'Добро пожаловать на Design Project',
-    views: req.session.views, // Передаём количество посещений в шаблон
-    designs: [],
-    hideNoDesignsMessage: true,
+    designs: [], // передача списка дизайнов
+    views: req.session.views || 0, // счетчик просмотров
   });
 });
-/* POST login/registration page. */
+
+// GET страница входа
+router.get('/login', (req, res) => {
+  res.render('login', { title: 'Вход', errorMessage: null });
+});
+
+// POST обработчик для входа
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.render('login', {
+        title: 'Вход',
+        errorMessage: 'Неправильное имя пользователя или пароль',
+      });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.render('login', {
+        title: 'Вход',
+        errorMessage: 'Неправильное имя пользователя или пароль',
+      });
+    }
+
+    req.session.user = { id: user._id, username: user.username };
+    res.redirect('/');
+  } catch (err) {
+    console.error('Ошибка при входе:', err.message);
+    res.render('login', {
+      title: 'Вход',
+      errorMessage: 'Произошла ошибка. Попробуйте снова.',
+    });
+  }
+});
+
+
+/* POST логика для входа и регистрации */
 router.post('/logreg', async function (req, res, next) {
   const username = req.body.username;
   const password = req.body.password;
@@ -59,96 +96,49 @@ router.post('/logreg', async function (req, res, next) {
   }
 });
 
+/* GET страница регистрации */
+router.get('/register', (req, res) => {
+  res.render('register', { title: 'Регистрация', errorMessage: null });
+});
 
-
-router.post('/login', async function (req, res, next) {
+/* POST запрос для регистрации */
+router.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Поиск пользователя
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.render('login', {
-        title: 'Вход',
-        errorMessage: 'Неправильное имя пользователя или пароль',
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.render('register', {
+        title: 'Регистрация',
+        errorMessage: 'Пользователь с таким именем уже существует.',
       });
     }
 
-    // Проверка пароля
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.render('login', {
-        title: 'Вход',
-        errorMessage: 'Неправильное имя пользователя или пароль',
-      });
-    }
-
-    // Успешный вход
-    req.session.user = { id: user._id, username: user.username };
-    res.redirect('/');
+    const newUser = new User({ username, password });
+    await newUser.save();
+    res.redirect('/login');
   } catch (err) {
-    console.error('Ошибка входа:', err);
-    res.render('login', {
-      title: 'Вход',
+    console.error('Ошибка при регистрации:', err.message);
+    res.render('register', {
+      title: 'Регистрация',
       errorMessage: 'Произошла ошибка. Попробуйте снова.',
     });
   }
 });
 
-
-
-// GET страница регистрации
-router.get('/register', (req, res) => {
-  res.render('register', { title: 'Регистрация', errorMessage: null });
+// Обработчик для выхода из системы
+router.get('/logout', (req, res) => {
+  // Удаление данных сессии пользователя
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Ошибка при уничтожении сессии:', err);
+      return res.status(500).send('Не удалось выйти из системы.');
+    }
+    // Перенаправление на главную страницу после выхода
+    res.redirect('/');
+  });
 });
 
-// POST запрос для регистрации
-router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-      // Проверка, существует ли пользователь
-      const existingUser = await User.findOne({ username });
-      if (existingUser) {
-          return res.render('register', {
-              title: 'Регистрация',
-              errorMessage: 'Пользователь с таким именем уже существует.',
-          });
-      }
-
-      // Создание нового пользователя
-      const newUser = new User({ username, password });
-      await newUser.save();
-
-      // Редирект на главную страницу или страницу входа
-      res.redirect('/login');
-  } catch (err) {
-      console.error('Ошибка при регистрации:', err.message);
-      res.render('register', {
-          title: 'Регистрация',
-          errorMessage: 'Произошла ошибка. Попробуйте снова.',
-      });
-  }
-});
-
-
-
-
-
-
-/* GET установка cookie */
-router.get('/set-cookie', function (req, res, next) {
-  // Установка cookie
-  res.cookie('userSession', 'active', { maxAge: 3600000, httpOnly: true }); // Cookie с действием на 1 час
-  res.send('Cookie установлена');
-});
-
-/* GET удаление cookie */
-router.get('/clear-cookie', function (req, res, next) {
-  // Очистка cookie
-  res.clearCookie('userSession');
-  res.send('Cookie очищена');
-});
 
 /* GET страница со списком всех дизайнов */
 router.get('/designs', async function (req, res, next) {
@@ -164,7 +154,6 @@ router.get('/designs', async function (req, res, next) {
     res.status(500).send('Ошибка загрузки данных');
   }
 });
-
 
 /* GET страница добавления нового дизайна */
 router.get('/add', function (req, res, next) {
@@ -203,66 +192,10 @@ router.get('/search', async function (req, res, next) {
   }
 });
 
-
-
-/* GET запрос для редактирования дизайна */
-router.get('/edit/:id', async function (req, res, next) {
-  try {
-    const design = await Design.findById(req.params.id); // Найти дизайн по ID
-    if (!design) {
-      return res.status(404).send('Дизайн не найден');
-    }
-    res.render('edit', { title: 'Редактировать дизайн', design });
-  } catch (err) {
-    console.error('Ошибка загрузки дизайна для редактирования:', err.message);
-    res.status(500).send('Ошибка загрузки данных');
-  }
-});
-
-/* POST запрос для обновления дизайна */
-router.post('/edit/:id', async function (req, res, next) {
-  try {
-    const { title, picture, desc } = req.body;
-    await Design.findByIdAndUpdate(req.params.id, { title, picture, desc }); // Обновить дизайн
-    res.redirect('/designs'); // Перенаправление на страницу со всеми дизайнами
-  } catch (err) {
-    console.error('Ошибка обновления дизайна:', err.message);
-    res.status(500).send('Ошибка обновления данных');
-  }
-});
-
-/* GET запрос для удаления дизайна */
-router.get('/delete/:id', async function (req, res, next) {
-  try {
-    await Design.findByIdAndDelete(req.params.id); // Удалить дизайн по ID
-    res.redirect('/designs'); // Перенаправление на страницу со всеми дизайнами
-  } catch (err) {
-    console.error('Ошибка удаления дизайна:', err.message);
-    res.status(500).send('Ошибка удаления данных');
-  }
-});
-
-
-
-
-
-
-
-
-router.get('/check-session', (req, res) => {
-  if (!req.session.viewCount) {
-      req.session.viewCount = 1;
-  } else {
-      req.session.viewCount += 1;
-  }
-  console.log('Текущая сессия:', req.session);
-  res.send(`Вы посетили эту страницу ${req.session.viewCount} раз.`);
-});
-
-/* GET страницы дизайнов по названию (title). */
+/* GET страницы дизайнов по названию (title) */
 router.get('/:designTitle', async function (req, res, next) {
   try {
-    const design = await Design.findOne({ title: req.params.designTitle }); // Найти дизайн по названию
+    const design = await Design.findOne({ title: req.params.designTitle });
     if (!design) {
       return res.status(404).send('Дизайн не найден');
     }
@@ -277,17 +210,17 @@ router.get('/:designTitle', async function (req, res, next) {
   }
 });
 
-
-/* GET страница конкретного дизайна по ID */
-router.get('/design/:designId', async function (req, res, next) {
+router.get('/design/:designId', async (req, res, next) => {
   try {
     const designId = req.params.designId; // Извлечение параметра из URL
     const design = await Design.findById(designId); // Поиск дизайна по ID
 
     if (!design) {
+      // Если дизайн не найден, вернуть 404
       return res.status(404).send('Дизайн не найден');
     }
 
+    // Рендер страницы дизайна
     res.render('design', {
       title: design.title,
       picture: design.picture,
@@ -298,5 +231,6 @@ router.get('/design/:designId', async function (req, res, next) {
     res.status(500).send('Ошибка загрузки данных');
   }
 });
+
 
 module.exports = router;

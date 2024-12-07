@@ -8,6 +8,10 @@ const connectDB = require('./db'); // Подключение функции дл
 const session = require('express-session'); // Подключаем express-session
 const MongoStore = require('connect-mongo'); // Подключаем хранилище MongoDB для сессий
 
+// Подключение маршрутов
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+
 // Подключение к базе данных
 connectDB();
 
@@ -53,10 +57,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(require("./middlewares/createUser"));
 
 // Подключение маршрутов
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
