@@ -12,6 +12,10 @@ const MongoStore = require('connect-mongo'); // Подключаем храни�
 // Инициализация приложения
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 // Middleware для добавления глобальной переменной navLinks
 app.use((req, res, next) => {
   res.locals.navLinks = [

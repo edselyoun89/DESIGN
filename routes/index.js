@@ -19,11 +19,19 @@ router.get('/', function (req, res, next) {
     hideNoDesignsMessage: true,
   });
 });
+/* POST login/registration page */
+router.post('/logreg', function (req, res, next) {
+  const username = req.body.username;
+  const password = req.body.password;
 
-/* GET login/registration page. */
-router.get('/logreg', function(req, res, next) {
-  res.render('logreg',{title: 'Вход'});
-  });
+  // Логирование для проверки
+  console.log('Имя пользователя:', username);
+  console.log('Пароль:', password);
+
+  // Временный ответ
+  res.send(`Полученные данные: Имя - ${username}, Пароль - ${password}`);
+});
+
 
 router.post('/login', async function (req, res, next) {
   const { username, password } = req.body;
