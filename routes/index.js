@@ -176,6 +176,21 @@ router.get('/check-session', (req, res) => {
   res.send(`Вы посетили эту страницу ${req.session.viewCount} раз.`);
 });
 
+router.get('/track-views', async function (req, res, next) {
+  try {
+      if (!req.session.viewCount) {
+          req.session.viewCount = 1; // Устанавливаем начальное значение
+      } else {
+          req.session.viewCount++; // Увеличиваем счетчик
+      }
+
+      const views = req.session.viewCount;
+      res.send(`Вы посетили эту страницу ${views} раз.`);
+  } catch (err) {
+      console.error('Ошибка при отслеживании посещений:', err.message);
+      res.status(500).send('Ошибка сервера');
+  }
+});
 
 
 

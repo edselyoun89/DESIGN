@@ -12,6 +12,18 @@ const MongoStore = require('connect-mongo'); // Подключаем храни�
 // Инициализация приложения
 const app = express();
 
+// Middleware для добавления глобальной переменной navLinks
+app.use((req, res, next) => {
+  res.locals.navLinks = [
+    { name: 'Главная', url: '/' },
+    { name: 'Все дизайны', url: '/designs' },
+    { name: 'Добавить дизайн', url: '/add' },
+    { name: 'Посещения', url: '/track-views' },
+  ];
+  next();
+});
+
+
 // Настройка сессий с использованием MongoDB
 app.use(
   session({
