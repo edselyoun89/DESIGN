@@ -13,6 +13,8 @@
     "ejs-locals": "^1.0.2",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
+    "mongodb": "^6.11.0",
+    "mongoose": "^8.8.4",
     "morgan": "~1.9.1"
   }
 }
