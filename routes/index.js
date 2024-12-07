@@ -52,4 +52,42 @@ router.get('/:designTitle', async function(req, res, next) {
   }
 });
 
+/* GET страница редактирования дизайна */
+router.get('/edit/:id', async function (req, res, next) {
+  try {
+    const design = await Design.findById(req.params.id); // Найти дизайн по ID
+    if (!design) {
+      return res.status(404).send('Дизайн не найден');
+    }
+    res.render('edit', { title: 'Редактировать дизайн', design });
+  } catch (err) {
+    console.error('Ошибка загрузки дизайна для редактирования:', err.message);
+    res.status(500).send('Ошибка загрузки данных');
+  }
+});
+
+/* POST запрос для обновления дизайна */
+router.post('/edit/:id', async function (req, res, next) {
+  try {
+    const { title, picture, desc } = req.body;
+    await Design.findByIdAndUpdate(req.params.id, { title, picture, desc }); // Обновить данные в базе
+    res.redirect('/'); // Перенаправление на главную страницу
+  } catch (err) {
+    console.error('Ошибка обновления дизайна:', err.message);
+    res.status(500).send('Ошибка обновления данных');
+  }
+});
+
+
+/* GET запрос для удаления дизайна */
+router.get('/delete/:id', async function (req, res, next) {
+  try {
+    await Design.findByIdAndDelete(req.params.id); // Удалить дизайн по ID
+    res.redirect('/'); // Перенаправление на главную страницу
+  } catch (err) {
+    console.error('Ошибка удаления дизайна:', err.message);
+    res.status(500).send('Ошибка удаления данных');
+  }
+});
+
 module.exports = router;

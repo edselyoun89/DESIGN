@@ -3,15 +3,17 @@
 <div class="row">
     <% designs.forEach(design => { %>
         <div class="col-md-4">
-            <div class="card">
+            <div class="card mb-4">
                 <img src="<%= design.picture %>" class="card-img-top" alt="<%= design.title %>">
                 <div class="card-body">
                     <h5 class="card-title"><%= design.title %></h5>
                     <p class="card-text"><%= design.desc %></p>
-                    <a href="/<%= design.title %>" class="btn btn-primary">Подробнее</a>
-                    <a href="/add" class="btn btn-success mb-3">Добавить новый дизайн</a>
+                    <a href="/<%= design.title %>" class="btn btn-primary mb-2">Подробнее</a>
+                    <a href="/edit/<%= design._id %>" class="btn btn-warning btn-sm">Редактировать</a>
+                    <a href="/delete/<%= design._id %>" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены, что хотите удалить этот дизайн?')">Удалить</a>
                 </div>
             </div>
         </div>
     <% }); %>
 </div>
+<a href="/add" class="btn btn-success">Добавить новый дизайн</a>
