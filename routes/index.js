@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Design = require('../models/Design'); // Подключение модели Design
-const User = require('../models/user'); // Подключение модели User
+const User = require('../models/User'); // Подключение модели User
 
 
 /* GET главная страница */
@@ -19,18 +19,46 @@ router.get('/', function (req, res, next) {
     hideNoDesignsMessage: true,
   });
 });
-/* POST login/registration page */
-router.post('/logreg', function (req, res, next) {
+/* POST login/registration page. */
+router.post('/logreg', async function (req, res, next) {
   const username = req.body.username;
   const password = req.body.password;
 
-  // Логирование для проверки
   console.log('Имя пользователя:', username);
   console.log('Пароль:', password);
 
-  // Временный ответ
-  res.send(`Полученные данные: Имя - ${username}, Пароль - ${password}`);
+  try {
+    const users = await User.find({ username: username });
+    console.log('Найденные пользователи:', users);
+
+    if (!users.length) {
+      // Пользователь НЕ найден - создаём нового
+      const user = new User({ username: username, password: password });
+      await user.save();
+
+      req.session.user_id = user._id; // Сохраняем ID нового пользователя в сессии
+      return res.redirect('/');
+    } else {
+      // Пользователь найден - проверяем пароль
+      const foundUser = users[0];
+
+      if (foundUser.checkPassword(password)) {
+        req.session.user_id = foundUser._id; // Сохраняем ID пользователя в сессии
+        return res.redirect('/');
+      } else {
+        // Возврат на страницу с ошибкой
+        return res.render('register', {
+          title: 'Вход/Регистрация',
+          errorMessage: 'Неправильный пароль. Попробуйте снова.',
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Ошибка при обработке логики пользователя:', err.message);
+    res.status(500).send('Произошла ошибка. Попробуйте снова.');
+  }
 });
+
 
 
 router.post('/login', async function (req, res, next) {

@@ -8,13 +8,14 @@ const connectDB = require('./db'); // Подключение функции дл
 const session = require('express-session'); // Подключаем express-session
 const MongoStore = require('connect-mongo'); // Подключаем хранилище MongoDB для сессий
 
+// Подключение к базе данных
+connectDB();
 
 // Инициализация приложения
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 // Middleware для добавления глобальной переменной navLinks
 app.use((req, res, next) => {
@@ -26,7 +27,6 @@ app.use((req, res, next) => {
   ];
   next();
 });
-
 
 // Настройка сессий с использованием MongoDB
 app.use(
@@ -41,9 +41,6 @@ app.use(
     cookie: { secure: false, maxAge: 3600000 }, // Настройка cookie (1 час)
   })
 );
-
-// Подключение к базе данных
-connectDB();
 
 // Установка шаблонизатора ejs-locals
 app.engine('ejs', engine);

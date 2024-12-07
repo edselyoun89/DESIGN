@@ -1,5 +1,5 @@
 var mongoose = require("mongoose");
-var { User } = require("./models/user");
+var { User } = require("./models/User");
 
 mongoose.connect("mongodb://localhost/design_project", {
   useNewUrlParser: true,

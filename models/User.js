@@ -1,9 +1,8 @@
-var mongoose = require("mongoose");
-var crypto = require("crypto");
+const mongoose = require('mongoose');
+const crypto = require('crypto');
 
-var Schema = mongoose.Schema;
-
-var userSchema = new Schema({
+// Схема пользователя
+const userSchema = new mongoose.Schema({
   username: {
     type: String,
     unique: true,
@@ -24,20 +23,25 @@ var userSchema = new Schema({
 });
 
 // Виртуальное поле для пароля
-userSchema
-  .virtual("password")
+userSchema.virtual('password')
   .set(function (password) {
-    this._purePassword = password;
-    this.salt = Math.random() + "";
+    this._plainPassword = password;
+    this.salt = Math.random() + '';
     this.hashedPassword = this.encryptPassword(password);
   })
   .get(function () {
-    return this._purePassword;
+    return this._plainPassword;
   });
 
-// Метод для хэширования пароля
+// Метод для шифрования пароля
 userSchema.methods.encryptPassword = function (password) {
-  return crypto.createHmac("sha1", this.salt).update(password).digest("hex");
+  return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
 };
 
-module.exports.User = mongoose.model("User", userSchema);
+// Метод для проверки пароля
+userSchema.methods.checkPassword = function (password) {
+  return this.encryptPassword(password) === this.hashedPassword;
+};
+
+// Экспорт модели User
+module.exports = mongoose.model('User', userSchema);
