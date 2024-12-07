@@ -1,3 +1,5 @@
+<% layout('./layout/page.ejs') %>
+<h1 class="text-center"><%= title %></h1>
 
 <form action="/search" method="GET" class="d-flex mb-4">
     <input 
@@ -7,13 +9,10 @@
       placeholder="Введите название дизайна" 
       required>
     <button type="submit" class="btn btn-primary">Найти</button>
-  </form>
-  
+</form>
 
-<% layout('./layout/page.ejs') %>
-<h1 class="text-center"><%= title %></h1>
 <div class="row">
-    <% if (designs.length > 0) { %>
+    <% if (designs && designs.length > 0) { %>
         <% designs.forEach(design => { %>
             <div class="col-md-4">
                 <div class="card mb-4">
@@ -21,13 +20,13 @@
                     <div class="card-body">
                         <h5 class="card-title"><%= design.title %></h5>
                         <p class="card-text"><%= design.desc %></p>
-                        <a href="/<%= design.title %>" class="btn btn-primary mb-2">Подробнее</a>
+                        <a href="/design/<%= design._id %>" class="btn btn-primary mb-2">Подробнее</a>
                     </div>
                 </div>
             </div>
         <% }); %>
     <% } else { %>
-        <p>Дизайны не найдены</p>
+        <p class="text-center">Дизайны не найдены</p>
     <% } %>
 </div>
 

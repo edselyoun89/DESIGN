@@ -8,7 +8,6 @@ const Review = require('../models/Review'); // Подключение модел
 router.get('/', async function (req, res, next) {
   try {
     const designs = await Design.find(); // Получить все дизайны из базы данных
-    console.log('Дизайны из базы:', designs); // Отладочный вывод
     res.render('index', { 
       title: 'Добро пожаловать на Design Project', 
       designs // Передача данных в шаблон
@@ -20,6 +19,26 @@ router.get('/', async function (req, res, next) {
 });
 
 
+/* GET страница конкретного дизайна по ID */
+router.get('/design/:designId', async function (req, res, next) {
+  try {
+    const designId = req.params.designId; // Извлечение параметра из URL
+    const design = await Design.findById(designId); // Поиск дизайна по ID
+
+    if (!design) {
+      return res.status(404).send('Дизайн не найден');
+    }
+
+    res.render('design', {
+      title: design.title,
+      picture: design.picture,
+      desc: design.desc,
+    });
+  } catch (err) {
+    console.error('Ошибка загрузки дизайна:', err.message);
+    res.status(500).send('Ошибка загрузки данных');
+  }
+});
 
 
 
