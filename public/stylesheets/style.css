@@ -6,3 +6,15 @@ body {
 a {
   color: #00B7FF;
 }
+
+form.d-flex {
+  max-width: 600px;
+  margin: 0 auto 20px;
+}
+form.d-flex input {
+  border-radius: 5px;
+}
+form.d-flex button {
+  border-radius: 5px;
+}
+
