@@ -1,0 +1,17 @@
+<% layout('./layout/page.ejs') %>
+<h1 class="text-center"><%= title %></h1>
+<form action="/add" method="POST" class="mt-4">
+  <div class="mb-3">
+    <label for="title" class="form-label">Название дизайна</label>
+    <input type="text" class="form-control" id="title" name="title" required>
+  </div>
+  <div class="mb-3">
+    <label for="picture" class="form-label">Ссылка на изображение</label>
+    <input type="url" class="form-control" id="picture" name="picture" required>
+  </div>
+  <div class="mb-3">
+    <label for="desc" class="form-label">Описание дизайна</label>
+    <textarea class="form-control" id="desc" name="desc" rows="3" required></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Добавить дизайн</button>
+</form>

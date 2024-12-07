@@ -16,6 +16,24 @@ router.get('/', async function(req, res, next) {
   }
 });
 
+/* GET страница добавления дизайна */
+router.get('/add', function (req, res, next) {
+  res.render('add', { title: 'Добавить новый дизайн' });
+});
+
+/* POST запрос для добавления нового дизайна */
+router.post('/add', async function (req, res, next) {
+  try {
+    const { title, picture, desc } = req.body;
+    const newDesign = new Design({ title, picture, desc });
+    await newDesign.save(); // Сохранение нового дизайна в базе
+    res.redirect('/'); // Перенаправление на главную страницу после добавления
+  } catch (err) {
+    console.error('Ошибка добавления дизайна:', err.message);
+    res.status(500).send('Ошибка добавления дизайна');
+  }
+});
+
 /* GET страницы дизайнов по названию (title). */
 router.get('/:designTitle', async function(req, res, next) {
   try {
