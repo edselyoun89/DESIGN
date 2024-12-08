@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 const Design = require('../models/Design'); // Подключение модели Design
 const User = require('../models/User'); // Подключение модели User
+const checkAuth = require('../middlewares/checkAuth'); // Подключение middleware
+
 
 /* GET главная страница */
 router.get('/', function (req, res, next) {
@@ -12,6 +14,11 @@ router.get('/', function (req, res, next) {
     designs: [], // Список дизайнов
     views: req.session.views || 0, // Счетчик просмотров
   });
+});
+
+/* GET страница добавления нового дизайна (только для авторизованных пользователей) */
+router.get('/add', checkAuth, (req, res) => {
+  res.render('add', { title: 'Добавить новый дизайн' });
 });
 
 
@@ -183,14 +190,14 @@ router.get('/logout', (req, res) => {
 
 
 
-/* GET страница со списком всех дизайнов */
-router.get('/designs', async function (req, res, next) {
+/* GET страница со списком всех дизайнов (только для авторизованных пользователей) */
+router.get('/designs', checkAuth, async (req, res) => {
   try {
     const designs = await Design.find(); // Получить все дизайны
     res.render('designs', { 
       title: 'Список всех дизайнов', 
       designs,
-      searchQuery: '' // Передать пустую строку для поля поиска
+      searchQuery: '',
     });
   } catch (err) {
     console.error('Ошибка загрузки дизайнов:', err.message);
@@ -204,11 +211,11 @@ router.get('/add', function (req, res, next) {
 });
 
 /* POST запрос для добавления нового дизайна */
-router.post('/add', async function (req, res, next) {
+router.post('/add', checkAuth, async (req, res) => {
   try {
     const { title, picture, desc } = req.body;
     const newDesign = new Design({ title, picture, desc });
-    await newDesign.save(); // Сохранение дизайна в базе данных
+    await newDesign.save();
     res.redirect('/designs'); // Перенаправление на страницу со всеми дизайнами
   } catch (err) {
     console.error('Ошибка добавления дизайна:', err.message);
