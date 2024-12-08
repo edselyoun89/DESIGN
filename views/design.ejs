@@ -1,7 +1,22 @@
 <% layout('./layout/page.ejs') %>
-<h1 class="text-center"><%= title %></h1>
-<div class="text-center">
-  <img src="<%= picture %>" alt="<%= title %>" class="img-fluid mb-4">
-  <p><%= desc %></p>
-  <a href="/" class="btn btn-secondary">Назад</a>
+<h1 class="text-center animate__animated animate__fadeInDown" style="color: #76e6c9; font-weight: bold;"><%= title %></h1>
+
+<div class="text-center mt-4" data-aos="zoom-in">
+  <img src="<%= picture %>" alt="<%= title %>" class="img-fluid mb-4 shadow-lg" style="border-radius: 20px; max-height: 500px; object-fit: cover;">
+  <p class="px-3" style="font-size: 1.2rem; line-height: 1.6; background-color: #2a2a2a; color: #e0e0e0; padding: 15px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);">
+    <%= desc %>
+  </p>
+  <a href="/" class="btn btn-success mt-4 shadow" style="font-weight: bold; border-radius: 50px; padding: 10px 30px; transition: transform 0.2s;">
+    Назад
+  </a>
 </div>
+
+<script>
+  // Добавление эффекта масштабирования при наведении на кнопку
+  document.querySelector('.btn-success').addEventListener('mouseover', function () {
+    this.style.transform = 'scale(1.05)';
+  });
+  document.querySelector('.btn-success').addEventListener('mouseout', function () {
+    this.style.transform = 'scale(1)';
+  });
+</script>

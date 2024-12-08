@@ -177,16 +177,17 @@ router.post('/register', async (req, res) => {
 
 
 // Обработчик для выхода из системы
-router.get('/logout', (req, res) => {
+router.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      console.error('Ошибка выхода:', err);
+      console.error('Ошибка выхода из системы:', err);
       return res.status(500).send('Не удалось выйти из системы.');
     }
-    res.clearCookie('connect.sid'); // Удаляем cookie
+    res.clearCookie('connect.sid'); // Удаляем cookie сессии
     res.redirect('/'); // Перенаправляем на главную страницу
   });
 });
+
 
 
 
@@ -279,6 +280,18 @@ router.get('/design/:designId', async (req, res, next) => {
   } catch (err) {
     console.error('Ошибка загрузки дизайна:', err.message);
     res.status(500).send('Ошибка загрузки данных');
+  }
+});
+
+
+router.post('/design/delete/:id', async (req, res) => {
+  try {
+    const designId = req.params.id;
+    await Design.findByIdAndDelete(designId); // Удалить дизайн по ID
+    res.redirect('/designs'); // Перенаправление на список дизайнов
+  } catch (err) {
+    console.error('Ошибка при удалении дизайна:', err.message);
+    res.status(500).send('Ошибка при удалении дизайна');
   }
 });
 

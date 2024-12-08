@@ -11,6 +11,8 @@ const MongoStore = require('connect-mongo'); // Подключаем храни�
 // Подключение маршрутов
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const authRouter = require('./middlewares/checkAuth');
+
 
 // Подключение к базе данных
 connectDB();
@@ -67,8 +69,14 @@ app.use('/users', usersRouter);
 
 // Обработка ошибок 404
 app.use(function (req, res, next) {
-  next(createError(404));
+  res.status(404).render('error', {
+    title: '404 - Страница не найдена',
+    message: 'Запрашиваемая страница не существует.',
+    error: { status: 404, stack: '' },
+  });
 });
+
+
 
 // Обработчик ошибок
 app.use(function (err, req, res, next) {
@@ -76,7 +84,12 @@ app.use(function (err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   res.status(err.status || 500);
-  res.render('error');
+  res.render('error', {
+    title: 'Ошибка', // Передача title в шаблон
+    message: err.message,
+    error: err,
+  });
 });
+
 
 module.exports = app;

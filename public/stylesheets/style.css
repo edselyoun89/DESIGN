@@ -1,20 +1,136 @@
+/* Общий стиль */
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #1e1e2f, #27273f);
+  color: #fff;
+  margin: 0;
+  padding: 0;
 }
 
-a {
-  color: #00B7FF;
+.navbar-brand {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  transition: color 0.3s ease-in-out;
 }
 
-form.d-flex {
-  max-width: 600px;
-  margin: 0 auto 20px;
-}
-form.d-flex input {
-  border-radius: 5px;
-}
-form.d-flex button {
-  border-radius: 5px;
+.navbar-brand:hover {
+  color: #ff7e5f;
 }
 
+.nav-link {
+  margin: 0 15px;
+  font-size: 1rem;
+  color: #bbb;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #ff7e5f;
+  transform: translateY(-3px);
+}
+
+.container {
+  max-width: 1200px;
+}
+
+/* Карточки */
+.card {
+  background-color: #2a2a2a;
+  border: none;
+  border-radius: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: #fff;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.card-text {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+/* Кнопки */
+.btn-primary {
+  background: linear-gradient(45deg, #ff7e5f, #feb47b);
+  border: none;
+  font-weight: bold;
+  color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(255, 126, 95, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(45deg, #6a11cb, #2575fc);
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(37, 117, 252, 0.4);
+}
+
+/* Поля ввода */
+.form-control {
+  background-color: #3c3c3c;
+  border: 1px solid #555;
+  color: #fff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #ff7e5f;
+  box-shadow: 0 0 5px rgba(255, 126, 95, 0.5);
+}
+
+/* Заголовки */
+h1, h2, h3 {
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Footer */
+footer {
+  background: #1e1e2f;
+  color: #ccc;
+  font-size: 0.9rem;
+  padding: 15px 0;
+  text-align: center;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animated-title {
+  animation: fadeIn 1s ease-in-out;
+}
+
+.card, .btn {
+  animation: fadeIn 0.6s ease-in-out;
+}

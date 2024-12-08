@@ -1,17 +1,72 @@
 <% layout('./layout/page.ejs') %>
 
-<h1 class="text-center">Вход</h1>
-<form action="/login" method="POST" class="mx-auto" style="max-width: 400px;">
-    <% if (errorMessage) { %>
-        <div class="alert alert-danger"><%= errorMessage %></div>
-    <% } %>
-    <div class="mb-3">
-        <label for="username" class="form-label">Имя пользователя</label>
-        <input type="text" class="form-control" id="username" name="username" required>
-    </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Пароль</label>
-        <input type="password" class="form-control" id="password" name="password" required>
-    </div>
-    <button type="submit" class="btn btn-primary w-100">Войти</button>
-</form>
+<div class="login-container text-center">
+    <h1 class="animated-title">Вход</h1>
+    <form action="/login" method="POST" class="mx-auto shadow p-4 rounded" style="max-width: 400px; background-color: #2a2a2a;">
+        <% if (errorMessage) { %>
+            <div class="alert alert-danger"><%= errorMessage %></div>
+        <% } %>
+        <div class="mb-3">
+            <label for="username" class="form-label text-light">Имя пользователя</label>
+            <input type="text" class="form-control" id="username" name="username" required style="background-color: #3c3c3c; color: #fff;">
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label text-light">Пароль</label>
+            <input type="password" class="form-control" id="password" name="password" required style="background-color: #3c3c3c; color: #fff;">
+        </div>
+        <button type="submit" class="btn btn-gradient w-100">Войти</button>
+    </form>
+    <p class="mt-3 text-light">
+        Нет аккаунта? <a href="/register" class="text-primary">Зарегистрируйтесь</a>
+    </p>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #1e1e2f, #27273f);
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+    }
+
+    .login-container {
+        margin-top: 50px;
+    }
+
+    .animated-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #fff;
+        animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .btn-gradient {
+        background: linear-gradient(45deg, #6c63ff, #3b82f6);
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .btn-gradient:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.5);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-control:focus {
+        background-color: #3c3c3c;
+        border-color: #6c63ff;
+        box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+    }
+</style>

@@ -1,33 +1,73 @@
 <% layout('./layout/page.ejs') %>
-<h1 class="text-center"><%= title %></h1>
+<h1 class="text-center animate__animated animate__fadeInDown" style="color: #76e6c9; font-weight: bold;"><%= title %></h1>
 
-<form action="/search" method="GET" class="d-flex mb-4">
-    <input 
-      type="text" 
-      name="q" 
-      class="form-control me-2" 
-      placeholder="Введите название дизайна" 
-      value="<%= searchQuery || '' %>" 
-      required>
-    <button type="submit" class="btn btn-primary">Найти</button>
+<form action="/search" method="GET" class="d-flex justify-content-center mb-4" data-aos="fade-up">
+  <input 
+    type="text" 
+    name="q" 
+    class="form-control me-2 shadow-sm" 
+    placeholder="Введите название дизайна" 
+    value="<%= searchQuery || '' %>" 
+    style="border-radius: 30px; padding: 10px 20px; border: 2px solid #4caf50; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);"
+    required>
+  <button 
+    type="submit" 
+    class="btn btn-success shadow-sm" 
+    style="font-weight: bold; border-radius: 30px; padding: 10px 20px; transition: transform 0.2s;">
+    Найти
+  </button>
 </form>
 
-
-<div class="row">
+<div class="row g-4" data-aos="fade-up">
   <% if (designs && designs.length > 0) { %>
     <% designs.forEach(design => { %>
       <div class="col-md-4">
-        <div class="card mb-4">
-          <img src="<%= design.picture %>" class="card-img-top" alt="<%= design.title %>">
+        <div class="card mb-4 shadow-sm" style="border-radius: 20px; background-color: #2a2a2a; color: #e0e0e0;">
+          <img 
+            src="<%= design.picture %>" 
+            class="card-img-top" 
+            alt="<%= design.title %>" 
+            style="border-radius: 20px 20px 0 0; object-fit: cover; max-height: 200px;">
           <div class="card-body">
-            <h5 class="card-title"><%= design.title %></h5>
-            <p class="card-text"><%= design.desc %></p>
-            <a href="/design/<%= design._id %>" class="btn btn-primary">Подробнее</a>
+            <h5 class="card-title" style="color: #76e6c9; font-weight: bold;"><%= design.title %></h5>
+            <p class="card-text" style="font-size: 1rem; line-height: 1.5;"><%= design.desc %></p>
+            <a href="/design/<%= design._id %>" class="btn btn-success" 
+              style="font-weight: bold; border-radius: 30px; padding: 10px 20px; transition: transform 0.2s;">
+              Подробнее
+            </a>
+            <!-- Кнопка Удалить -->
+            <form action="/design/delete/<%= design._id %>" method="POST" class="delete-form d-inline">
+              <button type="submit" class="btn btn-danger"
+                style="font-weight: bold; border-radius: 30px; padding: 10px 20px; margin-left: 10px; transition: transform 0.2s;">
+                Удалить
+              </button>
+            </form>
           </div>
         </div>
       </div>
     <% }); %>
   <% } else { %>
-    <p class="text-center">Дизайны не найдены</p>
+    <p class="text-center" style="color: #e0e0e0; font-size: 1.2rem; font-weight: bold;">Дизайны не найдены</p>
   <% } %>
 </div>
+
+<script>
+  // Подтверждение перед удалением
+  document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function (event) {
+      if (!confirm('Вы уверены, что хотите удалить этот дизайн?')) {
+        event.preventDefault(); // Отменяем отправку формы
+      }
+    });
+  });
+
+  // Добавляем эффект масштабирования на кнопки
+  document.querySelectorAll('.btn-success, .btn-danger').forEach(button => {
+    button.addEventListener('mouseover', function () {
+      this.style.transform = 'scale(1.05)';
+    });
+    button.addEventListener('mouseout', function () {
+      this.style.transform = 'scale(1)';
+    });
+  });
+</script>

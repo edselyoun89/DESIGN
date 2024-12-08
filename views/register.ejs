@@ -1,22 +1,72 @@
 <% layout('./layout/page.ejs') %>
 
-<h1 class="text-center">Регистрация</h1>
-<form class="form-horizontal" action="/logreg" method="post">
-  <div class="form-group">
-    <label class="control-label col-sm-1">Имя пользователя</label>
-    <div class="col-sm-5">
-      <input class="form-control" type="text" placeholder="Введите имя" name="username" required />
-    </div>
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+  <div class="register-container shadow-lg p-5 rounded">
+    <h1 class="text-center animated-title">Регистрация</h1>
+    <form action="/logreg" method="POST" class="mt-4">
+      <div class="mb-3">
+        <label for="username" class="form-label text-light">Имя пользователя</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="Введите имя" required style="background-color: #3c3c3c; color: #fff;">
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label text-light">Пароль</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Введите пароль" required style="background-color: #3c3c3c; color: #fff;">
+      </div>
+      <button type="submit" class="btn btn-gradient w-100">Зарегистрироваться</button>
+    </form>
   </div>
-  <div class="form-group">
-    <label class="control-label col-sm-1">Пароль</label>
-    <div class="col-sm-5">
-      <input class="form-control" type="password" placeholder="Введите пароль" name="password" required />
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-offset-1 col-sm-5">
-      <input class="btn btn-primary" type="submit" value="Зарегистрироваться" />
-    </div>
-  </div>
-</form>
+</div>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #1e1e2f, #27273f);
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .register-container {
+    max-width: 400px;
+    background-color: #2a2a2a;
+  }
+
+  .animated-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    animation: fadeInDown 1s ease-in-out;
+  }
+
+  .btn-gradient {
+    background: linear-gradient(45deg, #ff7e5f, #feb47b);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .btn-gradient:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 126, 95, 0.5);
+  }
+
+  .form-control:focus {
+    background-color: #3c3c3c;
+    border-color: #ff7e5f;
+    box-shadow: 0 0 5px rgba(255, 126, 95, 0.5);
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
