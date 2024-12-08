@@ -26,8 +26,8 @@ const userSchema = new mongoose.Schema({
 userSchema.virtual('password')
   .set(function (password) {
     this._plainPassword = password;
-    this.salt = Math.random() + '';
-    this.hashedPassword = this.encryptPassword(password);
+    this.salt = Math.random().toString(); // Генерация соли
+    this.hashedPassword = this.encryptPassword(password); // Хэшируем пароль
   })
   .get(function () {
     return this._plainPassword;
@@ -40,8 +40,11 @@ userSchema.methods.encryptPassword = function (password) {
 
 // Метод для проверки пароля
 userSchema.methods.checkPassword = function (password) {
-  return this.encryptPassword(password) === this.hashedPassword;
-};
+    const isMatch = this.encryptPassword(password) === this.hashedPassword;
+    console.log('Проверка пароля:', isMatch); // Лог для отладки
+    return isMatch;
+  };
+  
 
 // Экспорт модели User
 module.exports = mongoose.model('User', userSchema);

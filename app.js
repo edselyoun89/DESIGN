@@ -35,16 +35,18 @@ app.use((req, res, next) => {
 // Настройка сессий с использованием MongoDB
 app.use(
   session({
-    secret: 'your_secret_key', // Уникальный ключ для подписи сессий
+    secret: 'your_secret_key',
     resave: false,
     saveUninitialized: true,
     store: MongoStore.create({
-      mongoUrl: 'mongodb://localhost/design_project', // URL MongoDB
-      collectionName: 'sessions', // Имя коллекции для хранения сессий
+      mongoUrl: 'mongodb://localhost/design_project',
+      collectionName: 'sessions',
     }),
-    cookie: { secure: false, maxAge: 3600000 }, // Настройка cookie (1 час)
+    cookie: { secure: false, maxAge: 3600000 },
   })
 );
+
+
 
 // Установка шаблонизатора ejs-locals
 app.engine('ejs', engine);

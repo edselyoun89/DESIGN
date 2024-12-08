@@ -49,9 +49,9 @@
         <h1 class="text-center"><%= title %></h1>
         <% if (user) { %>
             <p class="text-center">Привет, <%= user.username %>! Добро пожаловать!</p>
-        <% } else { %>
-            <p class="text-center">Привет, гость! <a href="/register">Зарегистрируйтесь</a> или <a href="/login">войдите</a> в систему.</p>
-        <% } %>
+            <% } else { %>
+                <p class="text-center">Привет, гость! <a href="/register">Зарегистрируйтесь</a> или <a href="/login">войдите</a> в систему.</p>
+                <% } %>
 
         <form action="/search" method="GET" class="d-flex mb-4">
             <input 
