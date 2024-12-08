@@ -15,36 +15,43 @@ router.get('/', function (req, res, next) {
 });
 
 
-router.post('/logreg', async function (req, res, next) {
+router.get('/logreg', (req, res) => {
+  res.render('logreg', { title: 'Вход/Регистрация', error: null });
+});
+
+router.post('/logreg', async (req, res) => {
   const { username, password } = req.body;
 
-  console.log('Имя пользователя:', username);
-  console.log('Пароль:', password);
-
   try {
-    const users = await User.find({ username: username });
-    console.log('Найденные пользователи:', users);
-
-    if (!users.length) {
-      // Пользователь НЕ найден - создаём нового
-      const user = new User({ username: username, password: password });
-      await user.save();
-
-      req.session.user = { id: user._id, username: user.username }; // Сохраняем данные в сессии
-      console.log('Сессия после регистрации:', req.session.user);
+    const user = await User.findOne({ username });
+    if (!user) {
+      // Создаем нового пользователя
+      const newUser = new User({ username, password });
+      await newUser.save();
+      req.session.user = { id: newUser._id, username: newUser.username };
       return res.redirect('/');
-    } else {
-      // Пользователь найден - ошибка
-      return res.render('register', {
+    }
+
+    // Если пользователь найден, проверяем пароль
+    if (!user.checkPassword(password)) {
+      return res.render('logreg', {
         title: 'Вход/Регистрация',
-        errorMessage: 'Пользователь уже существует.',
+        error: 'Пароль неверный. Попробуйте снова.',
       });
     }
+
+    // Если пароль верный
+    req.session.user = { id: user._id, username: user.username };
+    res.redirect('/');
   } catch (err) {
-    console.error('Ошибка при обработке логики регистрации:', err.message);
-    res.status(500).send('Произошла ошибка. Попробуйте снова.');
+    console.error('Ошибка при обработке логики пользователя:', err.message);
+    res.render('logreg', {
+      title: 'Вход/Регистрация',
+      error: 'Произошла ошибка. Попробуйте снова.',
+    });
   }
 });
+
 
 
 // GET страница входа
